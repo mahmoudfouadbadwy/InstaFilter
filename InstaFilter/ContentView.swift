@@ -14,8 +14,9 @@ struct ContentView: View {
     @State private var image: Image?
     @State private var filterIntensity = 0.5
     @State private var showingImagePicker = false
+    @State private var showingFilterActionSheet = false
     @State private var inputImage: UIImage?
-    @State private var currentFilter = CIFilter.sepiaTone()
+    @State private var currentFilter: CIFilter = CIFilter.sepiaTone()
 
     private let context = CIContext()
     
@@ -61,7 +62,7 @@ struct ContentView: View {
                 
                 HStack {
                     Button("Change Filter") {
-                        
+                        self.showingFilterActionSheet.toggle()
                     }
                     
                     Spacer()
@@ -77,6 +78,20 @@ struct ContentView: View {
                    onDismiss: loadImage) {
                 ImagePicker(image: self.$inputImage)
             }
+            .actionSheet(isPresented: $showingFilterActionSheet) {
+                ActionSheet(title: Text("Select a filter"),
+                            buttons: [.default(Text("Crystallize"), action: {
+                                self.setFilter(CIFilter.crystallize())
+                            }),
+                            .default(Text("Edges"), action: {
+                                self.setFilter(CIFilter.edges())
+                            }),
+                            .default(Text("Gaussian Blur"), action: {
+                                self.setFilter(CIFilter.gaussianBlur())
+                            }),
+                            .cancel()
+                            ])
+            }
         }
     }
     
@@ -91,7 +106,18 @@ struct ContentView: View {
     }
     
     private func applyProcessing() {
-        currentFilter.intensity = Float(filterIntensity)
+        let inputKeys = currentFilter.inputKeys
+        if inputKeys.contains(kCIInputIntensityKey) {
+            currentFilter.setValue(filterIntensity, forKey: kCIInputIntensityKey)
+        }
+        if inputKeys.contains(kCIInputRadiusKey) {
+            currentFilter.setValue(filterIntensity * 200 , forKey: kCIInputRadiusKey)
+        }
+        
+        if inputKeys.contains(kCIInputScaleKey) {
+            currentFilter.setValue(filterIntensity * 10 , forKey: kCIInputScaleKey)
+        }
+        
         guard let outputImage = currentFilter.outputImage else {
             return
         }
@@ -100,6 +126,11 @@ struct ContentView: View {
             let uiImage = UIImage(cgImage: cgImage)
             image = Image(uiImage: uiImage)
         }
+    }
+    
+    private func setFilter(_ filter: CIFilter) {
+        currentFilter = filter
+        loadImage()
     }
 }
 
