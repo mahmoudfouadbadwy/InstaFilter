@@ -1,2 +1,5 @@
-# InstaFilter
- An app that lets the user import photos from their library, then modify them using various image effects.
+# InstaFilter (SwiftUI #16)
+- An app that lets the user import photos from their library, then modify them using various image effects.
+- Integrate UIKIt with SwiftUI.
+ 
+ 
