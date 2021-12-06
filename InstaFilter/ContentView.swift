@@ -11,6 +11,7 @@ import CoreImage.CIFilterBuiltins
 
 struct ContentView: View {
     
+    //MARK: - Properties
     @State private var image: Image?
     @State private var filterIntensity = 0.5
     @State private var showingImagePicker = false
@@ -18,11 +19,9 @@ struct ContentView: View {
     @State private var inputImage: UIImage?
     @State private var currentFilter: CIFilter = CIFilter.sepiaTone()
     @State private var processedImage: UIImage?
-
     private let context = CIContext()
     
-   
-    
+    //MARK: - UI
     var body: some View {
         let intensity = Binding<Double>(
             get: {
@@ -84,20 +83,28 @@ struct ContentView: View {
                    onDismiss: loadImage) {
                 ImagePicker(image: self.$inputImage)
             }
-            .actionSheet(isPresented: $showingFilterActionSheet) {
-                ActionSheet(title: Text("Select a filter"),
-                            buttons: [.default(Text("Crystallize"), action: {
+                   .actionSheet(isPresented: $showingFilterActionSheet) {
+                       ActionSheet(
+                        title: Text("Select a filter"),
+                        buttons: [.default(
+                            Text("Crystallize"),
+                            action: {
                                 self.setFilter(CIFilter.crystallize())
-                            }),
-                            .default(Text("Edges"), action: {
+                            }
+                        ), .default(
+                            Text("Edges"),
+                            action: {
                                 self.setFilter(CIFilter.edges())
                             }),
-                            .default(Text("Gaussian Blur"), action: {
-                                self.setFilter(CIFilter.gaussianBlur())
-                            }),
-                            .cancel()
-                            ])
-            }
+                                  .default(
+                                    Text("Gaussian Blur"),
+                                    action: {
+                                        self.setFilter(CIFilter.gaussianBlur())
+                                    }),
+                                  .cancel()
+                                 ]
+                       )
+                   }
         }
     }
     
